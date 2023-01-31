@@ -7,6 +7,7 @@ import internal.dhcpserver.net.SubnetMask;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Optional;
 
@@ -21,8 +22,10 @@ public class DhcpServer {
     private static DatagramSocket serverSocket;
     private static DatagramSocket broadcastClientSocket;
     private static InetAddress broadcastIp;
-
     private static IpAddress serverIp;
+    private static ArrayList<Scope> scopes = new ArrayList<>();
+
+
 
     private static DhcpMessage makeOffer(DhcpMessage clientMsg){
         DhcpMessage dhcpMessage = new DhcpMessage();
@@ -276,5 +279,9 @@ public class DhcpServer {
             System.out.println("Не удалось получить broadcast");
         }
         return broadcast;
+    }
+
+    public static void addScope(Scope scope){
+        scopes.add(scope);
     }
 }

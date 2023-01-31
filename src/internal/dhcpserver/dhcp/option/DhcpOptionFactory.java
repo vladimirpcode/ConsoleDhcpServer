@@ -1,5 +1,7 @@
 package internal.dhcpserver.dhcp.option;
 
+import internal.dhcpserver.CriticalError;
+
 public class DhcpOptionFactory {
     //не передвигает указатель, просто возвращает опцию
     public static DhcpOption getDhcpOption(int code, int[] payload){
@@ -87,10 +89,172 @@ public class DhcpOptionFactory {
     }
 
     public static DhcpOption getDhcpOption(int code, String str){
-        return null;
+        DhcpOption option = null;
+        try {
+            switch (code) {
+                case 0 -> option = DhcpOption0.valueOf(str.split(" "));
+                case 1 -> option = DhcpOption1.valueOf(str.split(" "));
+                case 2 -> option = DhcpOption2.valueOf(str.split(" "));
+                case 3 -> option = DhcpOption3.valueOf(str.split(" "));
+                case 4 -> option = DhcpOption4.valueOf(str.split(" "));
+                case 5 -> option = DhcpOption5.valueOf(str.split(" "));
+                case 6 -> option = DhcpOption6.valueOf(str.split(" "));
+                case 7 -> option = DhcpOption7.valueOf(str.split(" "));
+                case 8 -> option = DhcpOption8.valueOf(str.split(" "));
+                case 9 -> option = DhcpOption9.valueOf(str.split(" "));
+                case 10 -> option = DhcpOption10.valueOf(str.split(" "));
+                case 11 -> option = DhcpOption11.valueOf(str.split(" "));
+                case 12 -> option = DhcpOption12.valueOf(str.split(" "));
+                case 13 -> option = DhcpOption13.valueOf(str.split(" "));
+                case 14 -> option = DhcpOption14.valueOf(str.split(" "));
+                case 15 -> option = DhcpOption15.valueOf(str.split(" "));
+                case 16 -> option = DhcpOption16.valueOf(str.split(" "));
+                case 17 -> option = DhcpOption17.valueOf(str.split(" "));
+                case 18 -> option = DhcpOption18.valueOf(str.split(" "));
+                case 19 -> option = DhcpOption19.valueOf(str.split(" "));
+                case 20 -> option = DhcpOption20.valueOf(str.split(" "));
+                case 21 -> option = DhcpOption21.valueOf(str.split(" "));
+                case 22 -> option = DhcpOption22.valueOf(str.split(" "));
+                case 23 -> option = DhcpOption23.valueOf(str.split(" "));
+                case 24 -> option = DhcpOption24.valueOf(str.split(" "));
+                case 25 -> option = DhcpOption25.valueOf(str.split(" "));
+                case 26 -> option = DhcpOption26.valueOf(str.split(" "));
+                case 27 -> option = DhcpOption27.valueOf(str.split(" "));
+                case 28 -> option = DhcpOption28.valueOf(str.split(" "));
+                case 29 -> option = DhcpOption29.valueOf(str.split(" "));
+                case 30 -> option = DhcpOption30.valueOf(str.split(" "));
+                case 31 -> option = DhcpOption31.valueOf(str.split(" "));
+                case 32 -> option = DhcpOption32.valueOf(str.split(" "));
+                case 33 -> option = DhcpOption33.valueOf(str.split(" "));
+                case 34 -> option = DhcpOption34.valueOf(str.split(" "));
+                case 35 -> option = DhcpOption35.valueOf(str.split(" "));
+                case 36 -> option = DhcpOption36.valueOf(str.split(" "));
+                case 37 -> option = DhcpOption37.valueOf(str.split(" "));
+                case 38 -> option = DhcpOption38.valueOf(str.split(" "));
+                case 39 -> option = DhcpOption39.valueOf(str.split(" "));
+                case 40 -> option = DhcpOption40.valueOf(str.split(" "));
+                case 41 -> option = DhcpOption41.valueOf(str.split(" "));
+                case 42 -> option = DhcpOption42.valueOf(str.split(" "));
+                case 43 -> option = DhcpOption43.valueOf(str.split(" "));
+                case 44 -> option = DhcpOption44.valueOf(str.split(" "));
+                case 45 -> option = DhcpOption45.valueOf(str.split(" "));
+                case 46 -> option = DhcpOption46.valueOf(str.split(" "));
+                case 47 -> option = DhcpOption47.valueOf(str.split(" "));
+                case 48 -> option = DhcpOption48.valueOf(str.split(" "));
+                case 49 -> option = DhcpOption49.valueOf(str.split(" "));
+                case 50 -> option = DhcpOption50.valueOf(str.split(" "));
+                case 51 -> option = DhcpOption51.valueOf(str.split(" "));
+                case 52 -> option = DhcpOption52.valueOf(str.split(" "));
+                case 53 -> option = DhcpOption53.valueOf(str.split(" "));
+                case 54 -> option = DhcpOption54.valueOf(str.split(" "));
+                case 55 -> option = DhcpOption55.valueOf(str.split(" "));
+                case 56 -> option = DhcpOption56.valueOf(str.split(" "));
+                case 57 -> option = DhcpOption57.valueOf(str.split(" "));
+                case 58 -> option = DhcpOption58.valueOf(str.split(" "));
+                case 59 -> option = DhcpOption59.valueOf(str.split(" "));
+                case 60 -> option = DhcpOption60.valueOf(str.split(" "));
+                case 61 -> option = DhcpOption61.valueOf(str.split(" "));
+                case 64 -> option = DhcpOption64.valueOf(str.split(" "));
+                case 65 -> option = DhcpOption65.valueOf(str.split(" "));
+                case 66 -> option = DhcpOption66.valueOf(str.split(" "));
+                case 67 -> option = DhcpOption67.valueOf(str.split(" "));
+                case 68 -> option = DhcpOption68.valueOf(str.split(" "));
+                case 69 -> option = DhcpOption69.valueOf(str.split(" "));
+                case 70 -> option = DhcpOption70.valueOf(str.split(" "));
+                case 71 -> option = DhcpOption71.valueOf(str.split(" "));
+                case 72 -> option = DhcpOption72.valueOf(str.split(" "));
+                case 73 -> option = DhcpOption73.valueOf(str.split(" "));
+                case 74 -> option = DhcpOption74.valueOf(str.split(" "));
+                case 75 -> option = DhcpOption75.valueOf(str.split(" "));
+                case 76 -> option = DhcpOption76.valueOf(str.split(" "));
+                case 255 -> option = DhcpOption255.valueOf(str.split(" "));
+            }
+        }catch (Exception exc){
+            CriticalError.crash(exc);
+        }
+        return option;
     }
 
     public static String getCmdDescription(int code){
-        return null;
+        String description = null;
+        switch (code){
+            case 0 -> description = DhcpOption0.getCmdDescription();
+            case 1 -> description = DhcpOption1.getCmdDescription();
+            case 2 -> description = DhcpOption2.getCmdDescription();
+            case 3 -> description = DhcpOption3.getCmdDescription();
+            case 4 -> description = DhcpOption4.getCmdDescription();
+            case 5 -> description = DhcpOption5.getCmdDescription();
+            case 6 -> description = DhcpOption6.getCmdDescription();
+            case 7 -> description = DhcpOption7.getCmdDescription();
+            case 8 -> description = DhcpOption8.getCmdDescription();
+            case 9 -> description = DhcpOption9.getCmdDescription();
+            case 10 -> description = DhcpOption10.getCmdDescription();
+            case 11 -> description = DhcpOption11.getCmdDescription();
+            case 12 -> description = DhcpOption12.getCmdDescription();
+            case 13 -> description = DhcpOption13.getCmdDescription();
+            case 14 -> description = DhcpOption14.getCmdDescription();
+            case 15 -> description = DhcpOption15.getCmdDescription();
+            case 16 -> description = DhcpOption16.getCmdDescription();
+            case 17 -> description = DhcpOption17.getCmdDescription();
+            case 18 -> description = DhcpOption18.getCmdDescription();
+            case 19 -> description = DhcpOption19.getCmdDescription();
+            case 20 -> description = DhcpOption20.getCmdDescription();
+            case 21 -> description = DhcpOption21.getCmdDescription();
+            case 22 -> description = DhcpOption22.getCmdDescription();
+            case 23 -> description = DhcpOption23.getCmdDescription();
+            case 24 -> description = DhcpOption24.getCmdDescription();
+            case 25 -> description = DhcpOption25.getCmdDescription();
+            case 26 -> description = DhcpOption26.getCmdDescription();
+            case 27 -> description = DhcpOption27.getCmdDescription();
+            case 28 -> description = DhcpOption28.getCmdDescription();
+            case 29 -> description = DhcpOption29.getCmdDescription();
+            case 30 -> description = DhcpOption30.getCmdDescription();
+            case 31 -> description = DhcpOption31.getCmdDescription();
+            case 32 -> description = DhcpOption32.getCmdDescription();
+            case 33 -> description = DhcpOption33.getCmdDescription();
+            case 34 -> description = DhcpOption34.getCmdDescription();
+            case 35 -> description = DhcpOption35.getCmdDescription();
+            case 36 -> description = DhcpOption36.getCmdDescription();
+            case 37 -> description = DhcpOption37.getCmdDescription();
+            case 38 -> description = DhcpOption38.getCmdDescription();
+            case 39 -> description = DhcpOption39.getCmdDescription();
+            case 40 -> description = DhcpOption40.getCmdDescription();
+            case 41 -> description = DhcpOption41.getCmdDescription();
+            case 42 -> description = DhcpOption42.getCmdDescription();
+            case 43 -> description = DhcpOption43.getCmdDescription();
+            case 44 -> description = DhcpOption44.getCmdDescription();
+            case 45 -> description = DhcpOption45.getCmdDescription();
+            case 46 -> description = DhcpOption46.getCmdDescription();
+            case 47 -> description = DhcpOption47.getCmdDescription();
+            case 48 -> description = DhcpOption48.getCmdDescription();
+            case 49 -> description = DhcpOption49.getCmdDescription();
+            case 50 -> description = DhcpOption50.getCmdDescription();
+            case 51 -> description = DhcpOption51.getCmdDescription();
+            case 52 -> description = DhcpOption52.getCmdDescription();
+            case 53 -> description = DhcpOption53.getCmdDescription();
+            case 54 -> description = DhcpOption54.getCmdDescription();
+            case 55 -> description = DhcpOption55.getCmdDescription();
+            case 56 -> description = DhcpOption56.getCmdDescription();
+            case 57 -> description = DhcpOption57.getCmdDescription();
+            case 58 -> description = DhcpOption58.getCmdDescription();
+            case 59 -> description = DhcpOption59.getCmdDescription();
+            case 60 -> description = DhcpOption60.getCmdDescription();
+            case 61 -> description = DhcpOption61.getCmdDescription();
+            case 64 -> description = DhcpOption64.getCmdDescription();
+            case 65 -> description = DhcpOption65.getCmdDescription();
+            case 66 -> description = DhcpOption66.getCmdDescription();
+            case 67 -> description = DhcpOption67.getCmdDescription();
+            case 68 -> description = DhcpOption68.getCmdDescription();
+            case 69 -> description = DhcpOption69.getCmdDescription();
+            case 70 -> description = DhcpOption70.getCmdDescription();
+            case 71 -> description = DhcpOption71.getCmdDescription();
+            case 72 -> description = DhcpOption72.getCmdDescription();
+            case 73 -> description = DhcpOption73.getCmdDescription();
+            case 74 -> description = DhcpOption74.getCmdDescription();
+            case 75 -> description = DhcpOption75.getCmdDescription();
+            case 76 -> description = DhcpOption76.getCmdDescription();
+            case 255 -> description = DhcpOption255.getCmdDescription();
+        }
+        return description;
     }
 }
