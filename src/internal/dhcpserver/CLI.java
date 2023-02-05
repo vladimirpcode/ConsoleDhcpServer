@@ -1,10 +1,9 @@
 package internal.dhcpserver;
 
-import internal.dhcpserver.dhcp.DhcpMessage;
 import internal.dhcpserver.dhcp.option.DhcpOption;
 import internal.dhcpserver.dhcp.option.DhcpOptionFactory;
 import internal.dhcpserver.net.IpAddress;
-import internal.dhcpserver.net.Subnet;
+import internal.dhcpserver.net.Network;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -31,14 +30,14 @@ public class CLI {
             DhcpServer.start();
         }));
         commands.add(new Command("add scope", () ->{
-            Subnet subnet;
+            Network network;
             IpAddress startAddress = null;
             IpAddress endAddress = null;
             ArrayList<IpAddress> excludedAddresses = new ArrayList<>();
             ArrayList<DhcpOption> options = new ArrayList<>();
             boolean active;
             System.out.println("Введите подсеть по образцу: 172.16.1.0/24");
-            subnet = new Subnet(scanner.nextLine());
+            network = new Network(scanner.nextLine());
             System.out.println("Введите стартовый IP адрес");
             try{
                  startAddress = new IpAddress(scanner.nextLine());
@@ -110,7 +109,7 @@ public class CLI {
             }else{
                 active = false;
             }
-            Scope scope = new Scope(subnet,startAddress,endAddress,excludedAddresses,options, active);
+            Scope scope = new Scope(network,startAddress,endAddress,excludedAddresses,options, active);
             DhcpServer.addScope(scope);
             System.out.println(scope);
         } ));

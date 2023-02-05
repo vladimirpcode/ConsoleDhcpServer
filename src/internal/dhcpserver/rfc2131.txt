@@ -168,7 +168,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    Protocol (TFTP) [20] provides for transport of a boot image from a
    boot server.  The Internet Control Message Protocol (ICMP) [16]
    provides for informing hosts of additional routers via "ICMP
-   redirect" messages.  ICMP also can provide subnet mask information
+   redirect" messages.  ICMP also can provide network mask information
    through the "ICMP mask request" message and other information through
    the (obsolete) "ICMP information request" message.  Hosts can locate
    routers through the ICMP router discovery mechanism [8].
@@ -216,7 +216,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    Not all of these parameters are required for a newly initialized
    client.  A client and server may negotiate for the transmission of
    only those parameters required by the client or specific to a
-   particular subnet.
+   particular network.
 
    DHCP allows but does not require the configuration of client
    parameters not directly related to the IP protocol.  DHCP also does
@@ -335,7 +335,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
         should not have to enter any per-client configuration
         parameters.
 
-      o DHCP should not require a server on each subnet.  To allow for
+      o DHCP should not require a server on each network.  To allow for
         scale and economy, DHCP must work across routers or through the
         intervention of BOOTP relay agents.
 
@@ -480,7 +480,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    the 'client identifier' may contain a hardware address, identical to
    the contents of the 'chaddr' field, or it may contain another type of
    identifier, such as a DNS name.  The 'client identifier' chosen by a
-   DHCP client MUST be unique to that client within the subnet to which
+   DHCP client MUST be unique to that client within the network to which
    the client is attached. If the client uses a 'client identifier' in
    one message, it MUST use that same identifier in all subsequent
    messages, to ensure that all servers correctly identify the client.
@@ -591,11 +591,11 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    of network parameters for network clients.  The model of DHCP
    persistent storage is that the DHCP service stores a key-value entry
    for each client, where the key is some unique identifier (for
-   example, an IP subnet number and a unique identifier within the
-   subnet) and the value contains the configuration parameters for the
+   example, an IP network number and a unique identifier within the
+   network) and the value contains the configuration parameters for the
    client.
 
-   For example, the key might be the pair (IP-subnet-number, hardware-
+   For example, the key might be the pair (IP-network-number, hardware-
    address) (note that the "hardware-address" should be typed by the
 
 
@@ -610,11 +610,11 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    bridged network) allowing for serial or concurrent reuse of a
    hardware address on different subnets, and for hardware addresses
    that may not be globally unique.  Alternately, the key might be the
-   pair (IP-subnet-number, hostname), allowing the server to assign
+   pair (IP-network-number, hostname), allowing the server to assign
    parameters intelligently to a DHCP client that has been moved to a
-   different subnet or has changed hardware addresses (perhaps because
+   different network or has changed hardware addresses (perhaps because
    the network interface failed and was replaced). The protocol defines
-   that the key will be (IP-subnet-number, hardware-address) unless the
+   that the key will be (IP-network-number, hardware-address) unless the
    client explicitly supplies an identifier using the 'client
    identifier' option.           A client can query the DHCP service to
    retrieve its configuration parameters.  The client interface to the
@@ -697,10 +697,10 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    described in section 3.2.
 
    1. The client broadcasts a DHCPDISCOVER message on its local physical
-      subnet.  The DHCPDISCOVER message MAY include options that suggest
+      network.  The DHCPDISCOVER message MAY include options that suggest
       values for the network address and lease duration.  BOOTP relay
       agents may pass the message on to DHCP servers not on the same
-      physical subnet.
+      physical network.
 
    2. Each server may respond with a DHCPOFFER message that includes an
       available network address in the 'yiaddr' field (and other
@@ -743,7 +743,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
 
    DHCPNAK      -  Server to client indicating client's notion of network
                    address is incorrect (e.g., client has moved to new
-                   subnet) or client's lease as expired
+                   network) or client's lease as expired
 
    DHCPDECLINE  -  Client to server indicating network address is already
                    in use.
@@ -941,12 +941,12 @@ Droms                       Standards Track                    [Page 17]
 RFC 2131          Dynamic Host Configuration Protocol         March 1997
 
 
-   1. The client broadcasts a DHCPREQUEST message on its local subnet.
+   1. The client broadcasts a DHCPREQUEST message on its local network.
       The message includes the client's network address in the
       'requested IP address' option. As the client has not received its
       network address, it MUST NOT fill in the 'ciaddr' field. BOOTP
       relay agents pass the message on to DHCP servers not on the same
-      subnet.  If the client used a 'client identifier' to obtain its
+      network.  If the client used a 'client identifier' to obtain its
       address, the client MUST use the same 'client identifier' in the
       DHCPREQUEST message.
 
@@ -998,7 +998,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
 
 
       If the client's request is invalid (e.g., the client has moved
-      to a new subnet), servers SHOULD respond with a DHCPNAK message to
+      to a new network), servers SHOULD respond with a DHCPNAK message to
       the client. Servers SHOULD NOT respond if their information is not
       guaranteed to be accurate.  For example, a server that identifies a
       request for an expired binding that is owned by another server SHOULD
@@ -1006,9 +1006,9 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
       mechanism to maintain coherency among the servers.
 
       If 'giaddr' is 0x0 in the DHCPREQUEST message, the client is on
-      the same subnet as the server.  The server MUST
+      the same network as the server.  The server MUST
       broadcast the DHCPNAK message to the 0xffffffff broadcast address
-      because the client may not have a correct network address or subnet
+      because the client may not have a correct network address or network
       mask, and the client may not be answering ARP requests.
       Otherwise, the server MUST send the DHCPNAK message to the IP
       address of the BOOTP relay agent, as recorded in 'giaddr'.  The
@@ -1072,7 +1072,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
       address locally, the client will not normally relinquish its
       lease during a graceful shutdown.  Only in the case where the
       client explicitly needs to relinquish its lease, e.g., the client
-      is about to be moved to a different subnet, will the client send
+      is about to be moved to a different network, will the client send
       a DHCPRELEASE message.
 
 3.3 Interpretation and representation of time values
@@ -1237,11 +1237,11 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    connectivity, a server MUST choose an address as a 'server
    identifier' that, to the best of the server's knowledge, is reachable
    from the client.  For example, if the DHCP server and the DHCP client
-   are connected to the same subnet (i.e., the 'giaddr' field in the
+   are connected to the same network (i.e., the 'giaddr' field in the
    message from the client is zero), the server SHOULD select the IP
-   address the server is using for communication on that subnet as the
+   address the server is using for communication on that network as the
    'server identifier'.  If the server is using multiple IP addresses on
-   that subnet, any such address may be used.  If the server has
+   that network, any such address may be used.  If the server has
    received a message through a DHCP relay agent, the server SHOULD
    choose an address from the interface on which the message was
    recieved as the 'server identifier' (unless the server has other,
@@ -1349,7 +1349,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    BROADCAST bit in the 'flags' field to 1 in any DHCPDISCOVER or
    DHCPREQUEST messages that client sends.  The BROADCAST bit will
    provide a hint to the DHCP server and BOOTP relay agent to broadcast
-   any messages to the client on the client's subnet.  A client that can
+   any messages to the client on the client's network.  A client that can
    receive unicast IP datagrams before its protocol software has been
    configured SHOULD clear the BROADCAST bit to 0.  The BOOTP
    clarifications document discusses the ramifications of the use of the
@@ -1405,7 +1405,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    identifier to identify the client.  If the client does not provide a
    'client identifier' option, the server MUST use the contents of the
    'chaddr' field to identify the client. It is crucial for a DHCP
-   client to use an identifier unique within the subnet to which the
+   client to use an identifier unique within the network to which the
    client is attached in the 'client identifier' option.  Use of
    'chaddr' as the client's unique identifier may cause unexpected
    results, as that identifier may be associated with a hardware
@@ -1468,7 +1468,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
         address is valid and not already allocated, ELSE
 
       o A new address allocated from the server's pool of available
-        addresses; the address is selected based on the subnet from which
+        addresses; the address is selected based on the network from which
         the message was received (if 'giaddr' is 0) or on the address of
         the relay agent that forwarded the message ('giaddr' when not 0).
 
@@ -1478,11 +1478,11 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    addresses are available.
 
    Note that, in some network architectures (e.g., internets with more
-   than one IP subnet assigned to a physical network segment), it may be
+   than one IP network assigned to a physical network segment), it may be
    the case that the DHCP client should be assigned an address from a
-   different subnet than the address recorded in 'giaddr'.  Thus, DHCP
+   different network than the address recorded in 'giaddr'.  Thus, DHCP
    does not require that the client be assigned as address from the
-   subnet in 'giaddr'.  A server is free to choose some other subnet,
+   network in 'giaddr'.  A server is free to choose some other network,
    and it is beyond the scope of the DHCP specification to describe ways
    in which the assigned IP address might be chosen.
 
@@ -1635,7 +1635,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
      class identifiers and the client's classes identified in the
      server,
 
-   o Parameters with non-default values on the client's subnet.
+   o Parameters with non-default values on the client's network.
 
    The server MAY choose to return the 'vendor class identifier' used to
    determine the parameters in the DHCPOFFER message to assist the
@@ -1709,7 +1709,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
       correct network is done by examining the contents of 'giaddr', the
       'requested IP address' option, and a database lookup. If the DHCP
       server detects that the client is on the wrong net (i.e., the
-      result of applying the local subnet mask or remote subnet mask (if
+      result of applying the local network mask or remote network mask (if
       'giaddr' is not zero) to 'requested IP address' option value
       doesn't match reality), then the server SHOULD send a DHCPNAK
       message to the client.
@@ -1734,16 +1734,16 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
       communicating DHCP servers on the same wire.
 
       If 'giaddr' is 0x0 in the DHCPREQUEST message, the client is on
-      the same subnet as the server.  The server MUST broadcast the
+      the same network as the server.  The server MUST broadcast the
       DHCPNAK message to the 0xffffffff broadcast address because the
-      client may not have a correct network address or subnet mask, and
+      client may not have a correct network address or network mask, and
       the client may not be answering ARP requests.
 
       If 'giaddr' is set in the DHCPREQUEST message, the client is on a
-      different subnet.  The server MUST set the broadcast bit in the
+      different network.  The server MUST set the broadcast bit in the
       DHCPNAK, so that the relay agent will broadcast the DHCPNAK to the
       client, because the client may not have a correct network address
-      or subnet mask, and the client may not be answering ARP requests.
+      or network mask, and the client may not be answering ARP requests.
 
    o DHCPREQUEST generated during RENEWING state:
 
@@ -2108,7 +2108,7 @@ All others                 MAY           MAY              MUST NOT
    request.  When broadcasting an ARP request for the suggested address,
    the client must fill in its own hardware address as the sender's
    hardware address, and 0 as the sender's IP address, to avoid
-   confusing ARP caches in other hosts on the same subnet.  If the
+   confusing ARP caches in other hosts on the same network.  If the
 
 
 
@@ -2120,7 +2120,7 @@ RFC 2131          Dynamic Host Configuration Protocol         March 1997
    network address appears to be in use, the client MUST send a
    DHCPDECLINE message to the server. The client SHOULD broadcast an ARP
    reply to announce the client's new IP address and clear any outdated
-   ARP cache entries in hosts on the client's subnet.
+   ARP cache entries in hosts on the client's network.
 
 4.4.2 Initialization with known network address
 
@@ -2479,7 +2479,7 @@ A. Host Configuration Parameters
            router address          (address)              HRC 3.3.1.6
            preference level        integer                HRC 3.3.1.6
    Static routes, list of:
-           destination             (host/subnet/net)      HRC 3.3.1.2
+           destination             (host/network/net)      HRC 3.3.1.2
            destination mask        (address mask)         HRC 3.3.1.2
            type-of-service         integer                HRC 3.3.1.2
            first-hop router        (address)              HRC 3.3.1.2

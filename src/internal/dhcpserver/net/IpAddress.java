@@ -24,6 +24,15 @@ public class IpAddress {
         strAddress = address;
     }
 
+    public IpAddress(IpAddress ip){
+        this.octets[0] = ip.octets[0];
+        this.octets[1] = ip.octets[1];
+        this.octets[2] = ip.octets[2];
+        this.octets[3] = ip.octets[3];
+        this.strAddress = String.valueOf(ip.octets[0]) + String.valueOf(ip.octets[1]) +
+                String.valueOf(ip.octets[2]) + String.valueOf(ip.octets[3]);
+    }
+
     public Inet4Address toInet4Address(){
         try {
             return (Inet4Address) (Inet4Address.getByName(toString()));
@@ -45,5 +54,39 @@ public class IpAddress {
     @Override
     public String toString(){
         return strAddress;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        IpAddress anotherIp = (IpAddress) obj;
+        return octets[0] == anotherIp.octets[0] &&
+                octets[1] == anotherIp.octets[1] &&
+                octets[2] == anotherIp.octets[2] &&
+                octets[3] == anotherIp.octets[3];
+    }
+
+
+    public IpAddress getNext(){
+        IpAddress result = new IpAddress(this);
+        int index = 3;
+        while(result.octets[index] == 255 && index >= 0){
+            index--;
+        }
+        if(index < 0){
+            //переполнение
+            try {
+                return new IpAddress(new int[]{0, 0, 0, 0});
+            }catch (Exception exc){
+                CriticalError.crash(exc);
+            }
+        }
+        result.octets[index]++;
+        index++;
+        while(index <= 3){
+            result.octets[index] = 0;
+            index++;
+        }
+
+        return result;
     }
 }
