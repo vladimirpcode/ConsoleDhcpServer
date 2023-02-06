@@ -7,9 +7,8 @@ import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
 public class Network {
-    IpAddress address;
-    SubnetMask mask;
-    IpAddress broadcast;
+    private IpAddress address;
+    private SubnetMask mask;
 
     public Network(IpAddress address, SubnetMask mask){
         this.address = address;
@@ -27,7 +26,7 @@ public class Network {
 
     @Override
     public String toString(){
-        return address.toString().substring(1) + "/" + String.valueOf(mask.getIntValue());
+        return address.toString() + "/" + String.valueOf(mask.getIntValue());
     }
 
     public boolean isEntry(IpAddress ip){
@@ -35,6 +34,33 @@ public class Network {
             return false;
         }
         return getHostPart(ip, this.mask).equals(getHostPart(this.address, this.mask));
+    }
+
+    public IpAddress getIpAddress(){
+        return address;
+    }
+
+    public SubnetMask getSubnetMask(){
+        return mask;
+    }
+    public IpAddress getBroadcast() {
+        IpAddress broadcast = null;
+        try {
+            broadcast = new IpAddress(new int[]{0, 0, 0, 0});
+
+            IpAddress networkPart = getNetworkPart(address, mask);
+            int prefix = mask.getIntValue();
+            for(int i = 0 ; i < 4; i++){
+                if((i + 1) *  8 <= prefix){
+                    broadcast.octets[i] = networkPart.octets[i];
+                }else{
+                    broadcast.octets[i] = networkPart.octets[i] | (255 >> (int)(prefix / (i + 1))) ;
+                }
+            }
+        } catch (Exception exc) {
+            CriticalError.crash(exc);
+        }
+        return broadcast;
     }
 
     public static IpAddress getHostPart(IpAddress ip, SubnetMask mask){
@@ -58,4 +84,5 @@ public class Network {
         result.octets[0] = ip.octets[0] & mask.data[0];
         return result;
     }
+
 }

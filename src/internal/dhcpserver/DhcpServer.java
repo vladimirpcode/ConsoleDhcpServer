@@ -4,11 +4,10 @@ import internal.dhcpserver.dhcp.*;
 import internal.dhcpserver.dhcp.option.*;
 import internal.dhcpserver.net.IpAddress;
 import internal.dhcpserver.net.SubnetMask;
-
+import java.util.Enumeration;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Optional;
 
 public class DhcpServer {
