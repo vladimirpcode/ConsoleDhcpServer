@@ -7,8 +7,9 @@ import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
 public class Network {
-    private IpAddress address;
-    private SubnetMask mask;
+    IpAddress address;
+    SubnetMask mask;
+    IpAddress broadcast;
 
     public Network(IpAddress address, SubnetMask mask){
         this.address = address;
@@ -36,33 +37,6 @@ public class Network {
         return getHostPart(ip, this.mask).equals(getHostPart(this.address, this.mask));
     }
 
-    public IpAddress getIpAddress(){
-        return address;
-    }
-
-    public SubnetMask getSubnetMask(){
-        return mask;
-    }
-    public IpAddress getBroadcast() {
-        IpAddress broadcast = null;
-        try {
-            broadcast = new IpAddress(new int[]{0, 0, 0, 0});
-
-            IpAddress networkPart = getNetworkPart(address, mask);
-            int prefix = mask.getIntValue();
-            for(int i = 0 ; i < 4; i++){
-                if((i + 1) *  8 <= prefix){
-                    broadcast.octets[i] = networkPart.octets[i];
-                }else{
-                    broadcast.octets[i] = networkPart.octets[i] | (255 >> (int)(prefix / (i + 1))) ;
-                }
-            }
-        } catch (Exception exc) {
-            CriticalError.crash(exc);
-        }
-        return broadcast;
-    }
-
     public static IpAddress getHostPart(IpAddress ip, SubnetMask mask){
         IpAddress result = null;
         try {
@@ -85,4 +59,19 @@ public class Network {
         return result;
     }
 
+    public IpAddress getBroadcast(){
+        IpAddress result = null;
+        try {
+            IpAddress tmp = new IpAddress(new int[]{255,255,255,255});
+            IpAddress hostPart = Network.getHostPart(tmp, this.mask);
+            result = new IpAddress(new int[]{0,0,0,0});
+            for(int i = 0; i < 4; i++){
+                result.octets[i] = result.octets[i] | this.address.octets[i] | hostPart.octets[i];
+
+            }
+        }catch (Exception exc){
+            CriticalError.crash("Не удалось получить broadcast для отправки offer-a");
+        }
+        return result;
+    }
 }

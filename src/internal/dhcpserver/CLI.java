@@ -8,7 +8,11 @@ import internal.dhcpserver.net.Network;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Scanner;
 
 public class CLI {
@@ -113,6 +117,69 @@ public class CLI {
             DhcpServer.addScope(scope);
             System.out.println(scope);
         } ));
+        commands.add(new Command("list interfaces", ()->{
+            try{
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface networkInterface = interfaces.nextElement();
+                    if(!networkInterface.isVirtual() && networkInterface.isUp()) {
+                        System.out.println(networkInterface.getIndex() + ") " + networkInterface.getDisplayName());
+                    }
+                }
+            }catch (Exception exc){
+                CriticalError.crash("не удалось выполнить команду list.interfaces");
+            }
+        }));
+        commands.add(new Command("use inteface", ()->{
+            try {
+                System.out.print("Введите номер интерфейса: ");
+                int interfaceNumber = Integer.parseInt(scanner.nextLine());
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface networkInterface = interfaces.nextElement();
+                    if (networkInterface.getIndex() == interfaceNumber) {
+                        DhcpServer.addNetworkInterface(networkInterface);
+                    }
+                }
+            }catch (Exception exc){
+                CriticalError.crash("Не удалось выполнить команду show interface");
+            }
+        }));
+        commands.add(new Command("unuse interface", ()->{
+            try {
+                System.out.print("Введите номер интерфейса: ");
+                int interfaceNumber = Integer.parseInt(scanner.nextLine());
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface networkInterface = interfaces.nextElement();
+                    if (networkInterface.getIndex() == interfaceNumber) {
+                        DhcpServer.removeNetworkInterface(networkInterface);
+                    }
+                }
+            }catch (Exception exc){
+                CriticalError.crash("Не удалось выполнить команду show interface");
+            }
+        }));
+        commands.add(new Command("show interface", () -> {
+            try {
+                System.out.print("Введите номер интерфейса: ");
+                int interfaceNumber = Integer.parseInt(scanner.nextLine());
+                Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                while (interfaces.hasMoreElements()) {
+                    NetworkInterface networkInterface = interfaces.nextElement();
+                    if (networkInterface.getIndex() == interfaceNumber) {
+                        System.out.println(networkInterface.getDisplayName());
+                        Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+                        while (addresses.hasMoreElements()){
+                            InetAddress address = addresses.nextElement();
+                            System.out.println(address.getHostAddress());
+                        }
+                    }
+                }
+            }catch (Exception exc){
+                CriticalError.crash("Не удалось выполнить команду show interface");
+            }
+        }));
     }
 
     static void start(){

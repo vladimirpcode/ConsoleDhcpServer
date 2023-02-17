@@ -21,7 +21,7 @@ public class IpAddress {
         octets[1] = Integer.valueOf(strOctets[1]);
         octets[2] = Integer.valueOf(strOctets[2]);
         octets[3] = Integer.valueOf(strOctets[3]);
-        strAddress = address;
+        this.strAddress = address;
     }
 
     public IpAddress(IpAddress ip){

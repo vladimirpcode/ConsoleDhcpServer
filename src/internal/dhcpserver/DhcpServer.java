@@ -4,11 +4,15 @@ import internal.dhcpserver.dhcp.*;
 import internal.dhcpserver.dhcp.option.*;
 import internal.dhcpserver.net.IpAddress;
 import internal.dhcpserver.net.SubnetMask;
-import java.util.Enumeration;
+
+import javax.management.DescriptorRead;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class DhcpServer {
     private static final int SERVER_PORT = 67;
@@ -21,12 +25,11 @@ public class DhcpServer {
     private static DatagramSocket serverSocket;
     private static DatagramSocket broadcastClientSocket;
     private static InetAddress broadcastIp;
-    private static IpAddress serverIp;
     private static ArrayList<Scope> scopes = new ArrayList<>();
+    private static HashMap<Scope, IpAddress> serverAddresses = new HashMap<>();
+    private static ArrayList<NetworkInterface> networkInterfaces = new ArrayList<>();
 
-
-
-    private static DhcpMessage makeOffer(DhcpMessage clientMsg){
+    private static DhcpMessage makeOffer(DhcpMessage clientMsg, IpAddress serverIp, IpAddress clientIp){
         DhcpMessage dhcpMessage = new DhcpMessage();
         dhcpMessage.setOp(DhcpMessageOpCode.ServerMessage);
         dhcpMessage.setHtype(NumberHardvareType.Ethernet10Mb);
@@ -97,7 +100,7 @@ public class DhcpServer {
         return dhcpMessage;
     }
 
-    private static DhcpMessage makeAck(DhcpMessage clientMsg){
+    private static DhcpMessage makeAck(DhcpMessage clientMsg, IpAddress serverIp, IpAddress clientIp){
         DhcpMessage dhcpMessage = new DhcpMessage();
         dhcpMessage.setOp(DhcpMessageOpCode.ServerMessage);
         dhcpMessage.setHtype(NumberHardvareType.Ethernet10Mb);
@@ -171,11 +174,95 @@ public class DhcpServer {
     private static void handleDatagram(byte[] data){
         DhcpMessage dhcpMessage = null;
         try {
+            //разбор DHCP сообщения
             dhcpMessage = DhcpMessage.valueOf(data);
             //пишем инфу в консоль
             System.out.println(dhcpMessage.getChaddr() + "\t" + dhcpMessage.findOption(53));
             //кидаем в ответ офер
             DhcpOption option = dhcpMessage.findOption(53);
+            DhcpOption53 option53 = null;
+            if(option != null){
+                option53 = (DhcpOption53) option;
+            }
+            if(dhcpMessage.getOp() == DhcpMessageOpCode.ClientMessage && option53 != null) {
+                IpAddress clientIpAddr = null;
+                switch (option53.getDhcpMessageType()) {
+                    case DHCPDISCOVER -> {
+                        boolean isAllocated = false;
+                        for(Scope scope:DhcpServer.scopes){
+                            if(!scope.isFull()){
+                                try {
+                                    clientIpAddr = scope.getFreeAddress();
+                                    isAllocated = true;
+                                }
+                                catch (Exception exc){
+                                    CriticalError.crash(exc);
+                                }
+                            }
+                        }
+                        if(!isAllocated){
+                            //свободного адреса не нашлось
+                        }else{
+
+                            for(Scope scope:serverAddresses.keySet()){
+                                DhcpMessage offer = makeOffer(dhcpMessage, serverAddresses.get(scope), clientIpAddr);
+                                byte[] sendBytes = offer.toByteArray();
+                                try {
+                                    System.out.println("Пробую отправить на броадкаст " + scope.network.getBroadcast());
+                                    broadcastClientSocket.send(new DatagramPacket(sendBytes,sendBytes.length, scope.network.getBroadcast().toInet4Address(), CLIENT_PORT));
+                                }catch (Exception exc){
+                                    System.out.println("Не удалось отправить offer (DHCP-сервер)");
+                                    exc.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                    case DHCPOFFER -> {
+                    }
+                    case DHCPREQUEST -> {
+                        boolean isAllocated = false;
+                        for(Scope scope:DhcpServer.scopes){
+                            if(!scope.isFull()){
+                                try {
+                                    clientIpAddr = scope.getFreeAddress();
+                                    isAllocated = true;
+                                }
+                                catch (Exception exc){
+                                    CriticalError.crash(exc);
+                                }
+                            }
+                        }
+                        if(!isAllocated){
+                            //свободного адреса не нашлось
+                        }else{
+
+                            for(Scope scope:serverAddresses.keySet()){
+                                DhcpMessage offer = makeOffer(dhcpMessage, serverAddresses.get(scope), clientIpAddr);
+                                byte[] sendBytes = offer.toByteArray();
+                                try {
+                                    System.out.println("Пробую отправить на броадкаст " + scope.network.getBroadcast());
+                                    broadcastClientSocket.send(new DatagramPacket(sendBytes,sendBytes.length, scope.network.getBroadcast().toInet4Address(), CLIENT_PORT));
+                                }catch (Exception exc){
+                                    System.out.println("Не удалось отправить offer (DHCP-сервер)");
+                                    exc.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                    case DHCPDECLINE -> {
+                    }
+                    case DHCPACK -> {
+                    }
+                    case DHCPNAK -> {
+                    }
+                    case DHCPRELEASE -> {
+                    }
+                    case DHCPINFORM -> {
+                    }
+
+                }
+            }
+            /*
             if(option != null){
                 DhcpOption53 option53 = (DhcpOption53) option;
                 if(option53.getDhcpMessageType().getCode() == 1){
@@ -203,6 +290,8 @@ public class DhcpServer {
                 }
 
             }
+            */
+
         }catch (DhcpMessageParseException exc){
             System.out.println("Ошибка разбора DHCP сообщения");
         }
@@ -211,12 +300,6 @@ public class DhcpServer {
 
     private static void handleDhcp() {
         stopFlag = false;
-        try {
-            serverIp = new IpAddress("192.168.10.50");
-        } catch (UnknownHostException exc) {
-            CriticalError.crash(exc);
-        }
-
 
         try {
             serverSocket = new DatagramSocket(SERVER_PORT);
@@ -255,32 +338,64 @@ public class DhcpServer {
         dhcpServerThread.start();
     }
 
-    public static InetAddress getBroadcast(){
-        InetAddress broadcast = null;
+    public static void addScope(Scope scope){
+        scopes.add(scope);
         try {
-
-
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = interfaces.nextElement();
-                //System.out.println(networkInterface.getIndex()+"$"+networkInterface.getDisplayName());
-                if(networkInterface.getDisplayName().equals("VMware Virtual Ethernet Adapter for VMnet2")) {
+                if (networkInterface.isUp()) {
                     for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
-                        broadcast = interfaceAddress.getBroadcast();
-                        if (broadcast == null)
-                            broadcastIp = broadcast;
-                        return broadcast;
+                        IpAddress ipAddr = new IpAddress(interfaceAddress.getAddress().getHostAddress().substring(1));
+
+                        if(scope.network.isEntry(ipAddr)){
+                            if(!DhcpServer.serverAddresses.containsKey(scope)){
+                                DhcpServer.serverAddresses.put(scope, ipAddr);
+                                return;
+                            }
+                        }
+
+
                     }
                 }
             }
+        }catch (Exception exc){
+            CriticalError.crash("Не удалось определить IP-адрес для диапозона " + scope.network);
         }
-        catch (Exception exc){
-            System.out.println("Не удалось получить broadcast");
-        }
-        return broadcast;
     }
 
-    public static void addScope(Scope scope){
-        scopes.add(scope);
+    public static void addNetworkInterface(NetworkInterface networkInterface){
+        networkInterfaces.add(networkInterface);
+        Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+        while(addresses.hasMoreElements()){
+            InetAddress address = addresses.nextElement();
+            IpAddress newAddr = null;
+            try {
+                newAddr = new IpAddress(address.toString());
+            }catch (Exception exc){
+
+            }
+            if(newAddr != null){
+                for(Scope scope:DhcpServer.scopes){
+                    if(scope.network.isEntry(newAddr)){
+                        DhcpServer.serverAddresses.put(scope, newAddr);
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    public static void removeNetworkInterface(NetworkInterface networkInterface){
+        networkInterfaces.removeIf(new Predicate<NetworkInterface>() {
+            @Override
+            public boolean test(NetworkInterface thisInterface) {
+                if(thisInterface.getIndex() == networkInterface.getIndex())
+                    return true;
+                else
+                    return false;
+            }
+        });
     }
 }

@@ -108,4 +108,15 @@ public class Scope {
         }
         return true;
     }
+
+    public IpAddress getFreeAddress() throws Exception{
+        IpAddress currentAddress = this.startAddress;
+        while (!currentAddress.equals(this.endAddress)){
+            if(!isLeased(currentAddress) && !isExcluded(currentAddress)){
+                return new IpAddress(currentAddress);
+            }
+            currentAddress = currentAddress.getNext();
+        }
+        throw new Exception();
+    }
 }
